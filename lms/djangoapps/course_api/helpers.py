@@ -53,9 +53,14 @@ def get_marketing_data(course_key, language):
     marketing_root_format = marketing_link('COURSE_DETAILS_API_FORMAT')
     url = marketing_root_format.format(course_id=course_key)
 
-    response = requests.get(url=url, headers={
-        'Accept-Language': language,
-    })
+    try:
+        response = requests.get(
+            url=url,
+            headers={'Accept-Language': language},
+            timeout=3
+        )
+    except requests.exceptions.Timeout:
+        response = HttpResponseNotFound()
 
     if response.status_code != 200:
         log.warning('Could not fetch the marketing details from the API. course_key=[%s], status_code=[%s], url=[%s].',
