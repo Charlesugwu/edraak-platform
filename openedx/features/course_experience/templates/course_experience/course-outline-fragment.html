@@ -93,7 +93,7 @@ course_sections = blocks.get('children')
                 <%
                 if subsection.get('due') is None:
                     # examples: Homework, Lab, etc.
-                    data_string = 'XXRRXXX'
+                    data_string = _(subsection.get('format', ''))
                 else:
                     if 'special_exam_info' in subsection:
                         data_string = _('due {date}')
