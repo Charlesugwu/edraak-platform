@@ -111,7 +111,7 @@ class GetMarketingDataHelperTestCase(TestCase):
             mocked_get.assert_called_once_with(
                 url=expected_url,
                 headers={'Accept-Language': 'eo'},
-                timeout=3
+                timeout=4
             )
 
     def test_valid_response(self):

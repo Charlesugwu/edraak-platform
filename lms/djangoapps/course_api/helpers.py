@@ -3,6 +3,9 @@ import requests
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
 import logging
+from rest_framework import status
+from rest_framework.exceptions import APIException
+
 
 log = logging.getLogger(__name__)
 
@@ -57,13 +60,29 @@ def get_marketing_data(course_key, language):
         response = requests.get(
             url=url,
             headers={'Accept-Language': language},
-            timeout=3
+            timeout=settings.EDRAAK_MARKETING_API_TIMEOUT
         )
     except requests.exceptions.Timeout:
-        response = HttpResponseNotFound()
+        raise APIException(
+            {
+                "status_code": status.HTTP_503_SERVICE_UNAVAILABLE,
+                "developerMessage": "Marketing courses API have timed out."
+            },
+            code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    except Exception:
+        log.exception('Something went wrong with the marketing courses API')
+        raise APIException(
+            {
+                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "developerMessage": "Marketing courses didn't respond correctly."
+            },
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     if response.status_code != 200:
         log.warning('Could not fetch the marketing details from the API. course_key=[%s], status_code=[%s], url=[%s].',
                     course_key, response.status_code, url)
         return {}
+
     return response.json()
