@@ -49,6 +49,7 @@ from util.db import outer_atomic
 from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
+log_apple = logging.getLogger('debugging_apple_sign_in')
 
 
 class LoginSessionView(APIView):
@@ -138,6 +139,7 @@ class RegistrationView(APIView):
         data = request.POST.copy()
 
         # Decrypt form data if it is encrypted
+        log_apple.warning(msg="1. request POST is {post}".format(post=str(request.POST)))
         if 'data_token' in request.POST:
             data_token = request.POST.get('data_token')
 
@@ -177,9 +179,12 @@ class RegistrationView(APIView):
 
         email = data.get('email')
         username = data.get('username')
+        log_apple.warning(msg="2. request data is {data}".format(data=str(data)))
 
         # Handle duplicate email/username
         conflicts = check_account_exists(email=email, username=username)
+        log_apple.warning(msg="3. account exists: {conflicts}".format(conflicts=conflicts))
+
         if conflicts:
             conflict_messages = {
                 "email": accounts.EMAIL_CONFLICT_MSG.format(email_address=email),
@@ -207,6 +212,9 @@ class RegistrationView(APIView):
             errors = {
                 err.field: [{"user_message": text_type(err)}]
             }
+
+            log_apple.warning(msg="4. AccountValidationError: {AccountValidationError}".format(AccountValidationError=text_type(err)))
+
             return JsonResponse(errors, status=409)
         except ValidationError as err:
             # Should only get non-field errors from this function
@@ -216,8 +224,14 @@ class RegistrationView(APIView):
                 field: [{"user_message": error} for error in error_list]
                 for field, error_list in err.message_dict.items()
             }
+
+            log_apple.warning(msg="5. ValidationError: {ValidationError}".format(ValidationError=str(errors)))
+
             return JsonResponse(errors, status=400)
         except PermissionDenied:
+
+            log_apple.warning(msg="6. PermissionDenied")
+
             return HttpResponseForbidden(_("Account creation not allowed."))
 
         response = JsonResponse({"success": True})

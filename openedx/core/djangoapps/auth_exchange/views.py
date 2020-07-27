@@ -31,6 +31,9 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+import logging
+
+log = logging.getLogger('debugging_apple_sign_in')
 
 
 class AccessTokenExchangeBase(APIView):

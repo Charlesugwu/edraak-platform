@@ -114,6 +114,7 @@ from edraak_marketing_email.helpers import unsubscribe_from_marketing_emails
 
 
 log = logging.getLogger("edx.student")
+log_apple = logging.getLogger('debugging_apple_sign_in')
 
 AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple(
@@ -729,6 +730,7 @@ def create_account_with_params(request, params):
             pipeline_user = None
             error_message = ""
             try:
+                log_apple.warning(msg='final. access token is {access_token} and {user}'.format(access_token=social_access_token, user=user.username))
                 pipeline_user = request.backend.do_auth(social_access_token, user=user)
             except AuthAlreadyAssociated:
                 error_message = _("The provided access_token is already associated with another user.")

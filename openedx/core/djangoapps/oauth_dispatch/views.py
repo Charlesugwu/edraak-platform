@@ -26,6 +26,9 @@ from openedx.core.lib.token_utils import JwtBuilder
 from . import adapters
 from .dot_overrides import views as dot_overrides_views
 from .toggles import ENFORCE_JWT_SCOPES
+import logging
+
+log = logging.getLogger('debugging_apple_sign_in')
 
 
 class _DispatchingView(View):
